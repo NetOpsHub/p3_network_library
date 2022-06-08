@@ -59,7 +59,7 @@ class p3_telnetlib_library:
             return False;
 
 def main():
-    telnet_client_instance = p3_telnetlib_library('cisc', '10.254.13.1', 23, 'adm1n', '', '');
+    telnet_client_instance = p3_telnetlib_library('cisco', '10.254.13.1', 23, 'adm1n', '', '');
     if telnet_client_instance.connect() != False:
         exec_command_result = telnet_client_instance.exec_command('show clock'); 
         if exec_command_result != False:
