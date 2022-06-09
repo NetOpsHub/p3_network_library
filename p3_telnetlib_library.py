@@ -35,38 +35,47 @@ class p3_telnetlib_library:
             self.telnet_client_instance.read_until(b'#', 4);
         else:
             return False;
-                
-    def exec_command(self, network_device_config): # support configuration file, sequence of commands and specific command
+            
+    def exec_configuration_file(self, configuration_file_path):
         if 'cisco' in self.network_device_type:
             bytes_string = bytes();
-            if type(network_device_config) in (str,) and '/' in network_device_config: 
-                with open(network_device_config, 'r') as network_device_config_instance:
-                    self.telnet_client_instance.write(b'\n');
-                    bytes_string += self.telnet_client_instance.read_until(b'#', 4);
-                    for command in network_device_config_instance:
-                        self.telnet_client_instance.write(command.encode('ascii'));
-                        bytes_string += self.telnet_client_instance.read_until(b'#', 4);
-            elif type(network_device_config) in (tuple, list): 
+            with open(configuration_file_path, 'r') as configuration_file_instance:
                 self.telnet_client_instance.write(b'\n');
                 bytes_string += self.telnet_client_instance.read_until(b'#', 4);
-                for command in network_device_config:
-                    self.telnet_client_instance.write(command.encode('ascii') + b'\n');
+                for command in configuration_file_instance:
+                    self.telnet_client_instance.write(command.encode('ascii'));
                     bytes_string += self.telnet_client_instance.read_until(b'#', 4);
-            else: 
-                self.telnet_client_instance.write(b'\n');
-                bytes_string += self.telnet_client_instance.read_until(b'#', 4);
-                self.telnet_client_instance.write(network_device_config.encode('ascii') + b'\n');
-                bytes_string += self.telnet_client_instance.read_until(b'#', 4);              
             return bytes_string.decode('ascii');
         else:
             return False;
-
+                    
+    def exec_sequence_of_commands(self, sequence_of_commands):
+        if 'cisco' in self.network_device_type:
+            bytes_string = bytes();
+            self.telnet_client_instance.write(b'\n');
+            bytes_string += self.telnet_client_instance.read_until(b'#', 4);
+            for command in sequence_of_commands:
+                self.telnet_client_instance.write(command.encode('ascii') + b'\n');
+                bytes_string += self.telnet_client_instance.read_until(b'#', 4);
+            return bytes_string.decode('ascii');
+        else:
+            return False;
+            
+    def exec_specific_command(self, command):
+        if 'cisco' in self.network_device_type:
+            bytes_string = bytes();
+            self.telnet_client_instance.write(b'\n');
+            bytes_string += self.telnet_client_instance.read_until(b'#', 4);
+            self.telnet_client_instance.write(command.encode('ascii') + b'\n');
+            bytes_string += self.telnet_client_instance.read_until(b'#', 4); 
+            return bytes_string.decode('ascii');
+        else:
+            return False;            
+                
 def main():
     telnet_client_instance = p3_telnetlib_library('cisco', '10.254.13.1', 23, 'adm1n', '', '');
     if telnet_client_instance.connect() != False:
-        exec_command_result = telnet_client_instance.exec_command('show clock'); 
-        if exec_command_result != False:
-            print(exec_command_result);
-            
+        print(telnet_client_instance.exec_specific_command('show clock'));
+        
 if __name__ == '__main__':
     main();
