@@ -21,13 +21,16 @@ class p3_telnetlib_library:
             self.telnet_client_instance.write(self.network_device_username.encode('ascii') + b'\n');
             self.telnet_client_instance.read_until(b'Password: ', 4);
             self.telnet_client_instance.write(self.network_device_password.encode('ascii') + b'\n');
-            if 'Login invalid' in self.telnet_client_instance.read_until(b'>', 4).decode('ascii'):
+            auth_status_flag = self.telnet_client_instance.read_until(b'>', 4);
+            if 'Login invalid' in auth_status_flag.decode('ascii'):
                 return False;
-            self.telnet_client_instance.write('enable'.encode('ascii') + b'\n');
-            self.telnet_client_instance.read_until(b'Password: ', 4);
-            self.telnet_client_instance.write(self.network_device_enable_password.encode('ascii') + b'\n');
-            if 'Password' in self.telnet_client_instance.read_until(b'#', 4).decode('ascii'):
-                return False;
+            if '#' not in auth_status_flag.decode('ascii'):
+                self.telnet_client_instance.write('enable'.encode('ascii') + b'\n');
+                self.telnet_client_instance.read_until(b'Password: ', 4);
+                self.telnet_client_instance.write(self.network_device_enable_password.encode('ascii') + b'\n');
+                enable_status_flag = self.telnet_client_instance.read_until(b'#', 4);
+                if 'Password' in enable_status_flag.decode('ascii'):
+                    return False;
             self.telnet_client_instance.write('terminal length 0'.encode('ascii') + b'\n');
             self.telnet_client_instance.read_until(b'#', 4);
         else:
