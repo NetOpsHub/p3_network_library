@@ -43,7 +43,7 @@ class p3_telnetlib_library:
                 self.telnet_client_instance.write(b'\n');
                 bytes_string += self.telnet_client_instance.read_until(b'#', 4);
                 for command in configuration_file_instance:
-                    self.telnet_client_instance.write(command.encode('ascii'));
+                    self.telnet_client_instance.write(command.strip().encode('ascii') + b'\n');
                     bytes_string += self.telnet_client_instance.read_until(b'#', 4);
             return bytes_string.decode('ascii');
         else:
