@@ -15,7 +15,6 @@ class p3_telnetlib_library:
             self.telnet_client_instance = telnetlib.Telnet(host=self.network_device_ip, port=self.network_device_port);
         except:
             return False;
-            
         if 'cisco' in self.network_device_type:
             self.telnet_client_instance.read_until(b'Username: ', 4);
             self.telnet_client_instance.write(self.network_device_username.encode('ascii') + b'\n');
